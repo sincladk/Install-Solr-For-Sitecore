@@ -8,7 +8,7 @@
 
 Param(
     $solrVersion = "4.10.4",
-    $installFolder = "c:\solr\temp",
+    $installFolder = "c:\solr",
     $solrPort = "8983",
     $solrHost = "localhost",
     $solrSSL = $false,
@@ -16,6 +16,11 @@ Param(
     $JREVersion = "1.8.0_201",
 	$solrInstanceName ="solr"
 )
+
+function Get-ScriptDirectory {
+    if ($psise) {Split-Path $psise.CurrentFile.FullPath}
+    else {$global:PSScriptRoot}
+}
 
 # Stop when there's an error in the script
 $ErrorActionPreference = "Stop"
@@ -25,7 +30,8 @@ $solrName = "solr-$solrVersion"
 $solrRoot = "$installFolder\$solrName"
 $solrCoreRootPath = "$solrRoot\server\solr"
 $exampleCollectionPath = "$solrCoreRootPath\collection1"
-$blankCoreZipPath = "C:\temp\Empty Solr Cores for Sitecore.zip"
+$scriptPath = Get-ScriptDirectory
+$blankCoreZipPath = "$scriptPath\Empty Solr Cores for Sitecore.zip"
 $nssmRoot = "$installFolder\nssm-$nssmVersion"
 $solrPackage = "https://archive.apache.org/dist/lucene/solr/$solrVersion/$solrName.zip"
 $nssmPackage = "https://nssm.cc/release/nssm-$nssmVersion.zip"
