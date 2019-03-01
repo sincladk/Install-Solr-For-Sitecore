@@ -3,11 +3,12 @@
 # PREREQUISITES
 # 1. Install PackageManagement: https://www.microsoft.com/en-us/download/details.aspx?id=51451
 # 2. Install the `Microsoft.PowerShell.Archive` module: `Install-Module Microsoft.PowerShell.Archive`
+# 
 ################################################################################################
 
 Param(
     $solrVersion = "4.10.4",
-    $installFolder = "c:\solr",
+    $installFolder = "c:\solr\temp",
     $solrPort = "8983",
     $solrHost = "localhost",
     $solrSSL = $false,
@@ -22,10 +23,14 @@ $ErrorActionPreference = "Stop"
 $JREPath = "C:\Program Files\Java\jre$JREVersion" ## Note that if you're running 32bit java, you will need to change this path
 $solrName = "solr-$solrVersion"
 $solrRoot = "$installFolder\$solrName"
+$solrCoreRootPath = "$solrRoot\server\solr"
+$exampleCollectionPath = "$solrCoreRootPath\collection1"
+$blankCoreZipPath = "C:\temp\Empty Solr Cores for Sitecore.zip"
 $nssmRoot = "$installFolder\nssm-$nssmVersion"
 $solrPackage = "https://archive.apache.org/dist/lucene/solr/$solrVersion/$solrName.zip"
 $nssmPackage = "https://nssm.cc/release/nssm-$nssmVersion.zip"
 $downloadFolder = "~\Downloads"
+
 
 ## Verify elevated
 ## https://superuser.com/questions/749243/detect-if-powershell-is-running-as-administrator
@@ -152,7 +157,40 @@ if($solrSSL -eq $true)
     }
 }
 
-# install the service & runs
+# Rename the example folder if the server folder does not exist
+if(!(Test-Path -Path "$solrRoot\server"))
+{
+    Write-Host "Renaming $solrRoot\example to $solrRoot\server"
+    Rename-Item -Path "$solrRoot\example" -NewName "server"
+    if(!(Test-Path -Path "$solrRoot\server"))
+    {
+        Throw "Could not rename $solrRoot\example to $solrRoot\server"
+    }
+}
+
+# Delete the example collection
+if(Test-Path -Path $exampleCollectionPath)
+{
+    Write-Host "Deleting example collection ($exampleCollectionPath)"
+    Remove-Item -Path "$exampleCollectionPath" -Recurse
+    if(Test-Path -Path "$exampleCollectionPath")
+    {
+        Throw "Could not delete $exampleCollectionPath"
+    }
+}
+
+# Extract the blank cores
+if(!(Test-Path -Path "$solrCoreRootPath\sitecore_core_index"))
+{
+    Write-Host "Extracting blank cores for Sitecore to $solrCoreRootPath"
+    Expand-Archive $blankCoreZipPath -DestinationPath $solrCoreRootPath
+    if(!(Test-Path -Path "$solrCoreRootPath\sitecore_core_index"))
+    {
+        Throw "Could not extract cores to $solrCoreRootPath"
+    }
+}
+
+# Install the service
 $svc = Get-Service "$solrInstanceName" -ErrorAction SilentlyContinue
 if(!($svc))
 {
@@ -160,13 +198,15 @@ if(!($svc))
     &"$installFolder\nssm-$nssmVersion\win64\nssm.exe" install "$solrInstanceName" "$solrRoot\bin\solr.cmd" "-f" "-p $solrPort"
     $svc = Get-Service "$solrInstanceName" -ErrorAction SilentlyContinue
 }
+
+# Start the service
 if($svc.Status -ne "Running")
 {
     Write-Host "Starting Solr service"
     Start-Service "$solrInstanceName"
 }
 
-# finally prove it's all working
+# Finally prove it's all working
 $protocol = "http"
 if($solrSSL -eq $true)
 {
