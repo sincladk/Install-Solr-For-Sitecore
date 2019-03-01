@@ -8,7 +8,7 @@
 Param(
     $solrVersion = "4.10.4",
     $installFolder = "c:\solr",
-    $solrPort = "9393",
+    $solrPort = "8983",
     $solrHost = "localhost",
     $solrSSL = $false,
     $nssmVersion = "2.24",
