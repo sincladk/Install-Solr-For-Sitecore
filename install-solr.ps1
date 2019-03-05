@@ -76,6 +76,12 @@ downloadAndUnzipIfRequired "Solr" $solrRoot $solrZip $solrPackage $installFolder
 $nssmZip = "$downloadFolder\nssm-$nssmVersion.zip"
 downloadAndUnzipIfRequired "NSSM" $nssmRoot $nssmZip $nssmPackage $installFolder
 
+# Ensure Java runtime environment path exists
+if (!(Test-Path -Path $JREPath))
+{
+    Throw "JRE path was not found: $JREPath"
+}
+
 # Ensure Java environment variable
 $jreVal = [Environment]::GetEnvironmentVariable("JAVA_HOME", [EnvironmentVariableTarget]::Machine)
 if($jreVal -ne $JREPath)
