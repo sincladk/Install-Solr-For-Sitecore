@@ -1,13 +1,14 @@
 ################################################################################################
 #
 # PREREQUISITES
-# 1. Install PackageManagement: https://www.microsoft.com/en-us/download/details.aspx?id=51451
-# 2. Install the `Microsoft.PowerShell.Archive` module: `Install-Module Microsoft.PowerShell.Archive`
+# 1. Install Java Runtime Environment: https://www.java.com/en/download/
+# 2. Install PackageManagement: https://www.microsoft.com/en-us/download/details.aspx?id=51451
+# 3. Install the `Microsoft.PowerShell.Archive` module: `Install-Module Microsoft.PowerShell.Archive`
 # 
 ################################################################################################
 
 Param(
-    $solrVersion = "4.10.4",
+    $solrVersion = "6.6.2",
     $installFolder = "c:\solr",
     $solrPort = "8983",
     $solrHost = "localhost",
@@ -25,7 +26,7 @@ function Get-ScriptDirectory {
 # Stop when there's an error in the script
 $ErrorActionPreference = "Stop"
 
-$JREPath = "C:\Program Files\Java\jre$JREVersion" ## Note that if you're running 32bit java, you will need to change this path
+$JREPath = "C:\Program Files (x86)\Java\jre$JREVersion" ## Note that if you're running 32bit java, you will need to change this path
 $solrName = "solr-$solrVersion"
 $solrRoot = "$installFolder\$solrName"
 $solrCoreRootPath = "$solrRoot\server\solr"
