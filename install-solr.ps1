@@ -12,7 +12,7 @@ Param(
     $installFolder = "c:\solr",
     $solrPort = "8983",
     $solrHost = "localhost",
-    $solrSSL = $false,
+    $solrSSL = $true,
     $nssmVersion = "2.24",
     $JREVersion = "1.8.0_201",
 	$solrInstanceName ="solr"
